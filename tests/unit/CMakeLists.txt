@@ -545,6 +545,9 @@ seastar_add_test (scheduling_group_nesting
 seastar_add_test (timer
   SOURCES timer_test.cc)
 
+seastar_add_test (sleep_uring
+  SOURCES sleep_uring_test.cc)
+
 seastar_add_test (uname
   KIND BOOST
   SOURCES uname_test.cc)
