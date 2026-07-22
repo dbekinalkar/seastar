@@ -66,6 +66,7 @@ set(rte_libs
   net_nfp
   net_qede
   net_ring
+  net_virtio
   net_vmxnet3
   pci
   rcu
