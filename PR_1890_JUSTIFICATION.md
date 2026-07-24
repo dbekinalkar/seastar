@@ -26,12 +26,43 @@ monitored during active processing as well as while the reactor is idle.
 
 ## Testing
 
-The issue was reproduced with the io_uring reactor and DPDK: the test
-application printed `Sleeping...` but the sleep future never completed.
+### Test environment
 
-With the fix applied, the same application, reactor backend, DPDK
-configuration, and network device complete successfully and print:
+* Ubuntu 22.04
+* Linux 6.8.0-1064-gcp
+* DPDK 23.07
+* Red Hat virtio NIC (`1af4:1000`) bound to `uio_pci_generic`
+* One Seastar shard
+* Reactor backends tested: `io_uring`, `linux-aio`, and `epoll`
 
-```text
-Sleeping... Done.
+The same DPDK-enabled `tcp_demo` was run with each reactor backend.
+
+Before the fix:
+
+| Reactor backend | Result |
+| --- | --- |
+| `epoll` | `Sleeping... Done.`; exit status 0 |
+| `linux-aio` | `Sleeping... Done.`; exit status 0 |
+| `io_uring` | Hung after `Sleeping...`; killed by timeout |
+
+After the fix:
+
+| Reactor backend | Result |
+| --- | --- |
+| `io_uring` | `Sleeping... Done.`; exit status 0 |
+
+The test used:
+
+```console
+sudo build/dev/demos/tcp_demo \
+  --reactor-backend <backend> \
+  --network-stack native \
+  --dpdk-pmd \
+  --dhcp 1 \
+  --smp 1 \
+  --memory 512M \
+  --lro off
 ```
+
+A unit regression test was also added to verify that `sleep()` completes while
+the reactor remains active processing I/O.
