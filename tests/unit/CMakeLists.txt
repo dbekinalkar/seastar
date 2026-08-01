@@ -522,6 +522,10 @@ seastar_add_test (epoll
 seastar_add_test (reactor_backend
   SOURCES reactor_backend_test.cc)
 
+seastar_add_test (reactor_backend_highres_timer_rearm
+  SOURCES reactor_backend_highres_timer_rearm_test.cc
+  RUN_ARGS --reactor-backend io_uring --poll-mode)
+
 seastar_add_test (sstring
   KIND BOOST
   SOURCES sstring_test.cc)
